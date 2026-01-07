@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>23 & 27 Aralık • Sana</title>
+  <style>
+    :root { --bg1:#0b1220; --bg2:#1b0b2a; --txt:#eaf2ff; }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; min-height:100vh; display:grid; place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--txt);
+      background: radial-gradient(1200px 700px at 20% 20%, #1c2a4a 0%, transparent 55%),
+                  radial-gradient(900px 500px at 80% 30%, #40144f 0%, transparent 55%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+    }
+
+    /* Yüzen minik kalpler */
+    .float-hearts{
+      position:fixed; inset:0; pointer-events:none; opacity:.65;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
+      z-index:1;
+    }
+    .h{
+      position:absolute; font-size:18px; transform:translate(-50%,-50%);
+      animation: rise linear infinite;
+      opacity:0;
+    }
+    @keyframes rise{
+      0%{ transform:translate(-50%, 20px) scale(.7); opacity:0; }
+      10%{ opacity:.9; }
+      90%{ opacity:.9; }
+      100%{ transform:translate(-50%, -120vh) scale(1.3); opacity:0; }
+    }
+
+    .card{
+      width:min(560px, 92vw);
+      padding:26px 22px 18px;
+      border-radius:18px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      position:relative;
+      z-index:2;
+    }
+    .top{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom:10px;
+    }
+    .badge{
+      font-size:13px; padding:6px 10px; border-radius:999px;
+      background: rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.12);
+      white-space:nowrap;
+    }
+    h1{ margin:0; font-size:26px; letter-spacing:.2px; }
+    .heart{
+      width:84px; height:84px; flex:0 0 auto;
+      display:grid; place-items:center;
+      border-radius:20px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    /* Büyük kalp */
+    .big{
+      width:34px; height:34px;
+      background: #ff4d6d;
+      position:relative;
+      transform: rotate(45deg);
+      animation: beat 1.1s ease-in-out infinite;
+      box-shadow: 0 10px 30px rgba(255,77,109,.25);
+    }
+    .big::before, .big::after{
+      content:""; position:absolute; width:34px; height:34px;
+      background:#ff4d6d; border-radius:50%;
+    }
+    .big::before{ left:-17px; top:0; }
+    .big::after{ top:-17px; left:0; }
+    @keyframes beat{
+      0%,100%{ transform:rotate(45deg) scale(1); }
+      50%{ transform:rotate(45deg) scale(1.14); }
+    }
+
+    .msg{
+      margin:12px 0 10px;
+      line-height:1.75;
+      font-size:16px;
+      min-height: 92px;
+      white-space:pre-wrap;
+    }
+    .cursor{
+      display:inline-block; width:10px; margin-left:2px;
+      animation: blink .9s steps(1) infinite;
+      opacity:.9;
+    }
+    @keyframes blink{ 50%{ opacity:0; } }
+
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;
+      align-items:center; justify-content:space-between;
+    }
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; }
+    button{
+      padding:10px 12px; border-radius:12px; border:0;
+      cursor:pointer; color:var(--txt);
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    button:hover{ background: rgba(255,255,255,.14); }
+    .soft{ opacity:.85; font-size:13px; }
+    .sig{
+      margin-top:12px; opacity:.8; font-size:13px;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+
+    /* Sürpriz modal */
+    .modal{
+      position:fixed; inset:0; display:none; place-items:center;
+      background: rgba(0,0,0,.55);
+      padding:18px;
+      z-index:6;
+    }
+    .modal.show{ display:grid; }
+    .box{
+      width:min(520px, 92vw);
+      background: rgba(20,20,30,.92);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      padding:18px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+    }
+    .box h2{ margin:0 0 10px; font-size:18px; }
+    .box p{ margin:0; line-height:1.7; white-space:pre-wrap; }
+    .box .close{ margin-top:12px; }
+
+    /* Giriş / Özür ekranı */
+    .intro{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.78);
+      display:grid; place-items:center;
+      z-index:10;
+      padding:18px;
+    }
+    .intro.hide{ display:none; }
+
+    .intro-card{
+      width:min(560px, 92vw);
+      background: rgba(20,20,30,.95);
+      border-radius:18px;
+      padding:20px;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 24px 60px rgba(0,0,0,.6);
+    }
+    .intro-badge{
+      display:inline-block;
+      font-size:13px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.09);
+      border:1px solid rgba(255,255,255,.12);
+      margin-bottom:10px;
+    }
+    .intro-card h2{ margin:0 0 10px; font-size:18px; }
+    .intro-card p{
+      margin:0;
+      line-height:1.75;
+      white-space:pre-wrap;
+      opacity:.95;
+    }
+    .intro-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    .intro-btn{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.10);
+      color: var(--txt);
+      cursor:pointer;
+    }
+    .intro-btn:hover{ background: rgba(255,255,255,.14); }
+  </style>
+</head>
+<body>
+
+  <!-- Giriş ekranı -->
+  <div class="intro" id="intro">
+    <div class="intro-card">
+      <div class="intro-badge">Bir dakika…</div>
+      <h2>Doğum gününü unuttuğum için özür dilerim</h2>
+      <p id="introText"></p>
+      <div class="intro-actions">
+        <button class="intro-btn" onclick="enterSite()">Devam et</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="float-hearts" id="float"></div>
+
+  <main class="card">
+    <div class="top">
+      <div>
+        <div class="badge" id="badge">23 & 27 Aralık • sadece sana</div>
+        <h1 id="title">Bir küçük “kod” gibi… ama duygulu 🙂</h1>
+      </div>
+      <div class="heart" aria-hidden="true">
+        <div class="big"></div>
+      </div>
+    </div>
+
+    <div class="msg"><span id="typed"></span><span class="cursor">|</span></div>
+
+    <div class="row">
+      <div class="btns">
+        <button onclick="show27()">27 Aralık 💌</button>
+        <button onclick="show23()">23 Aralık 🎂</button>
+        <button onclick="openSurprise()">Sürpriz 🎁</button>
+      </div>
+      <div class="soft" id="date"></div>
+    </div>
+
+    <div class="sig">
+      <span id="hint">İpucu: 23 Aralık = doğum günü • 27 Aralık = bizim tarihimiz</span>
+      <span id="footer"></span>
+    </div>
+  </main>
+
+  <div class="modal" id="modal" onclick="closeSurprise(event)">
+    <div class="box">
+      <h2>Mini sır ✨</h2>
+      <p id="surpriseText"></p>
+      <button class="close" onclick="closeSurprise()">Kapat</button>
+    </div>
+  </div>
+
+<script>
+  // Kişiselleştir:
+  const herName  = "♥";   // örn: "Elif"
+  const yourName = "Ben"; // örn: adın
+
+  // Girişte görünen özür mesajı (güçlü ama bahane üretmeyen)
+  const introMessage =
+`Bir aptallık yaptım
+
+Doğum gününü unuttum.
+Ve bunun “küçük bir detay” gibi görünmesini istemiyorum.
+Çünkü senin için önemli bir gün, benim de önemsemem gereken bir gündü.
+Kızmakta haklısın. seni üzdüysem senden özür dilerim.
+
+Bahane aramıyorum.
+Sadece şunu bilmeni istiyorum:
+Bu, seni umursamadığımdan değil; ama yine de yanlış olan benim.
+Kalbini kırdıysam, gerçekten özür dilerim.
+
+İstersen telafi etmeye çalışayım.
+İstersen sadece bil:
+Ben bu hatayı ciddiye alıyorum. Senden çok defa özür dilerim. 
+Dediğim gibi bana kızmakta bana bağırmakta hakılısın seni yargılamaya hakkım yok
+kızmak ta hakkın var.`;
+
+  // 27 Aralık mesajları
+  const lines27 = [
+    "27 Aralık benim için sıradan bir gün değil.\nÇünkü o gün, seni “daha fazla” düşünmeye başladım.",
+    "Seninle konuşunca içim rahatlıyor.\nSanki her şey biraz daha mümkün oluyor.",
+    "Kısa yazmak istedim ama olmadı.\nÇünkü sana dair hislerim kısa değil.",
+    "Bu sayfa bir şey kanıtlamak için değil.\nSadece: “Seni önemsiyorum” demek için."
+  ];
+
+  // 23 Aralık doğum günü mesajları (güzel sözler)
+  const lines23 = [
+    "23 Aralık… Senin günün.\nİyi ki doğdun, iyi ki varsın.",
+    "Yeni yaşın sana huzur, sağlık ve güzel sürprizler getirsin.\nGülüşün hep eksik olmasın.",
+    "Kendini en çok senin hak ettiğin gibi değerli hissettiğin bir yıl olsun.",
+    "Dileğim net:\nYorulduğunda dinlenebileceğin, sevindiğinde paylaşabileceğin güzel günler biriksin."
+  ];
+
+  const surpriseLines = [
+    "Bugün gülersen, benim günüm güzelleşir.",
+    "Senin iyi olman, benim için önemli.",
+    "23 Aralık’ı her yıl ‘iyi ki’ günü yapalım.",
+    "27 Aralık’ı da… güzel bir hatıra gibi saklayalım."
+  ];
+
+  // Typed effect
+  const typedEl = document.getElementById("typed");
+  let typing = false;
+  let timer = null;
+
+  function typeLine(text, speed=20){
+    typing = true;
+    typedEl.textContent = "";
+    let i = 0;
+    clearInterval(timer);
+    timer = setInterval(() => {
+      typedEl.textContent += text[i] ?? "";
+      i++;
+      if (i >= text.length){
+        clearInterval(timer);
+        typing = false;
+      }
+    }, speed);
+  }
+
+  // Modlar
+  let i27 = 0, i23 = 0;
+
+  function show27(){
+    if (typing) return;
+    typeLine(lines27[i27]);
+    i27 = (i27 + 1) % lines27.length;
+    setBadge("27 Aralık • sadece sana");
+    burstHearts(10);
+  }
+
+  function show23(){
+    if (typing) return;
+    typeLine(lines23[i23]);
+    i23 = (i23 + 1) % lines23.length;
+    setBadge("23 Aralık • doğum günün");
+    burstHearts(14);
+  }
+
+  // Badge / başlık / footer
+  const badgeEl = document.getElementById("badge");
+  function setBadge(t){ badgeEl.textContent = t; }
+
+  const titleEl = document.getElementById("title");
+  if (herName !== "♥") titleEl.textContent = `23 & 27 Aralık • ${herName}'e`;
+
+  document.getElementById("footer").textContent = `— ${yourName}`;
+
+  const now = new Date();
+  document.getElementById("date").textContent = now.toLocaleString("tr-TR");
+
+  // Modal
+  const modal = document.getElementById("modal");
+  const surpriseText = document.getElementById("surpriseText");
+  function openSurprise(){
+    const pick = surpriseLines[Math.floor(Math.random()*surpriseLines.length)];
+    surpriseText.textContent = pick;
+    modal.classList.add("show");
+    burstHearts(18);
+  }
+  function closeSurprise(e){
+    if (!e || e.target === modal) modal.classList.remove("show");
+  }
+
+  // Yüzen kalpler
+  const float = document.getElementById("float");
+  function spawnFloatHeart(){
+    const s = document.createElement("span");
+    s.className = "h";
+    s.textContent = "❤";
+    const x = Math.random() * 100;
+    const dur = 6 + Math.random() * 6;
+    const size = 14 + Math.random() * 18;
+    s.style.left = x + "vw";
+    s.style.bottom = (-10 - Math.random()*30) + "px";
+    s.style.fontSize = size + "px";
+    s.style.animationDuration = dur + "s";
+    s.style.animationDelay = (Math.random()*1.5) + "s";
+    float.appendChild(s);
+    setTimeout(() => s.remove(), (dur + 2) * 1000);
+  }
+  setInterval(spawnFloatHeart, 450);
+
+  function burstHearts(count=10){
+    for (let i=0;i<count;i++){
+      const s = document.createElement("span");
+      s.className = "h";
+      s.textContent = "❤";
+      s.style.left = (40 + Math.random()*20) + "vw";
+      s.style.bottom = (10 + Math.random()*20) + "vh";
+      s.style.fontSize = (12 + Math.random()*18) + "px";
+      s.style.animationDuration = (2.8 + Math.random()*2.2) + "s";
+      s.style.opacity = "1";
+      float.appendChild(s);
+      setTimeout(() => s.remove(), 5200);
+    }
+  }
+
+  // Giriş ekranı davranışı
+  document.getElementById("introText").textContent = introMessage;
+
+  function enterSite(){
+    document.getElementById("intro").classList.add("hide");
+    // İçeri girince ilk mesaj: 23 Aralık (doğum günü) ile başlasın
+    show23();
+  }
+
+  // Enter tuşu ile devam
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !document.getElementById("intro").classList.contains("hide")){
+      enterSite();
+    }
+  });
+</script>
+
+</body>
+</html>
